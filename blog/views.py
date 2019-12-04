@@ -1,5 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
+
+from .forms import PostForm
 from .models import Post
 
 # Create your views here.
@@ -15,3 +17,23 @@ def post_detail(request, pk):
     stuff_for_frontend = {'post': post}
     return render(request, 'blog/post_detail.html', stuff_for_frontend)
 
+def post_new(request):
+    # Everything within the if statement (excluding the else statement) is for
+    # when anyone does a "submit request", post request.
+    if request.method == 'POST':
+        # (for line 23) To get access to the text and title from Post (models).
+        form = PostForm(request.POST)
+        # is_valid() is to get clean input from the user.
+        if form.is_valid():
+            # commit means to create/save an object in the data base.
+            post = form.save(commit=False)
+            # (for line 28) The author is anyone who is currently logged in and put that in the data base.
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            # (for line 33) Using redirect to only post once and then redirect to a different page.
+            return redirect('post_detail', pk=post.pk)
+    else:  # Within this else statement is for a GET request
+        form = PostForm()
+        stuff_for_frontend = {'form': form}
+    return render(request, 'blog/post_edit.html', stuff_for_frontend)
