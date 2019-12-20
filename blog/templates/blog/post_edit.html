@@ -1,6 +1,7 @@
 <!-- this file is called post_edit because we can use the same
      html for creating and editing a post.  -->
 {% extends 'blog/base.html' %}
+{% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
     <h1>New Post</h1>
