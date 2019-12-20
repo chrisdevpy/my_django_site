@@ -29,7 +29,6 @@ def post_new(request):
             post = form.save(commit=False)
             # (for line 28) The author is anyone who is currently logged in and put that in the data base.
             post.author = request.user
-            post.published_date = timezone.now()
             post.save()
             # (for line 33) Using redirect to only post once and then redirect to a different page.
             return redirect('post_detail', pk=post.pk)
@@ -46,10 +45,19 @@ def post_edit(request, pk):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            post.published_date = timezone.now()
             post.save()
             return redirect('post_detail', pk=post.pk)
     else:
         form = PostForm(instance=post)
         stuff_for_frontend = {'form': form}
     return render(request, 'blog/post_edit.html', stuff_for_frontend)
+
+def post_draft_list(request):
+    posts = Post.objects.filter(published_date__isnull=True).order_by('-created_date')
+    stuff_for_frontend = {'posts': posts}
+    return render(request, 'blog/post_draft_list.html', stuff_for_frontend)
+
+def post_publish(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    post.publish()
+    return redirect('post_detail', pk=pk)
