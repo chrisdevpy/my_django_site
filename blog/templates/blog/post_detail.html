@@ -29,12 +29,12 @@
             <div class="date">
                 {{ comment.created_date }}
             </div>
-
+            <a href="{% url 'comment_remove' pk=comment.pk %}"><i class="fas fa-trash"></i></a>
             <strong>{{ comment.author }}</strong>
             <p>{{ comment.text }}</p>
         </div>
 
-    {% empty %}
+    {% empty %} <!-- instead of leaving empty/blank if no comment this is to say if blank, then say... -->
         <p>No comments yet...</p>
 
     {% endfor %}
