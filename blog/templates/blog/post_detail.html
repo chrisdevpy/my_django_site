@@ -24,16 +24,23 @@
     <hr>
     <a href="{% url 'add_comment_to_post' pk=post.pk %}" class="btn btn-secondary">Add comment</a>
     {% for comment in post.comments.all %}
-        <div class="comment">
+        {% if user.is_authenticated or comment.approved %} <!-- ( In this IF statement )  -->
+            <div class="comment">
 
-            <div class="date">
-                {{ comment.created_date }}
+                <div class="date">
+                    {{ comment.created_date }}
+                </div>
+
+                {% if not comment.approved and user.is_superuser %} <!-- ( In this IF statement ) Only the Super User has the ability to approve comments. -->
+                    <a href="{% url 'comment_approve' pk=comment.pk %}"><i class="fas fa-check"></i></a>
+
+                    <a href="{% url 'comment_remove' pk=comment.pk %}"><i class="fas fa-trash"></i></a>
+                {% endif %}
+
+                <strong>{{ comment.author }}</strong>
+                <p>{{ comment.text }}</p>
             </div>
-            <a href="{% url 'comment_remove' pk=comment.pk %}"><i class="fas fa-trash"></i></a>
-            <strong>{{ comment.author }}</strong>
-            <p>{{ comment.text }}</p>
-        </div>
-
+        {% endif %}
     {% empty %} <!-- instead of leaving empty/blank if no comment this is to say if blank, then say... -->
         <p>No comments yet...</p>
 
