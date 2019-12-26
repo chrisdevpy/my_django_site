@@ -18,6 +18,7 @@ def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     stuff_for_frontend = {'post': post}
     return render(request, 'blog/post_detail.html', stuff_for_frontend)
+
 @login_required
 def post_new(request):
     # Everything within the if statement (excluding the else statement) is for
@@ -66,6 +67,13 @@ def post_publish(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.publish()
     return redirect('post_detail', pk=pk)
+
+@login_required
+def post_delete(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    post.delete()
+    return redirect('/', pk=post.pk)
+
 @login_required
 def add_comment_to_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -80,17 +88,22 @@ def add_comment_to_post(request, pk):
     else:
         form = CommentForm()
     return render(request, 'blog/add_comment_to_post.html', {'form': form})
+
 @login_required
 def comment_remove(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     comment.delete()  # built-in Django models, if you have an object, just call delete() on it.
     return redirect('post_detail', pk=comment.post.pk)
+
 @login_required
 def comment_approve(request, pk):
     # mydjangosite.com/comment/2/approve --> the 2nd comment will get approved.
     comment = get_object_or_404(Comment, pk=pk)
     comment.approve()
     return redirect('post_detail', pk=comment.post.pk)
+
+
+
 
 
 
